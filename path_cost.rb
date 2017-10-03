@@ -9,7 +9,7 @@ def initialize(lines)
 	end
 	@path_list = []
 	@min_cost_path = []
-end 
+end
 
 def exec
   #large grids with all 0s will take a long time to complete...
@@ -24,9 +24,9 @@ def exec
    set_min_cost_path
 end
 
-def to_s 
+def to_s
 	#puts @path_list.inspect
-	"%s\n%s\n%s" % [complete?, min_cost, output_path] 
+	"%s\n%s\n%s" % [complete?, min_cost, output_path]
 end
 
 
@@ -38,16 +38,16 @@ def output_path
   @min_cost_path[:path].map{|m| m + 1}.join(' ')
 end
 
-def complete? 
-  
+def complete?
+
   @min_cost_path[:path].count == @grid[0].count ? 'Yes' : 'No'
 end
 
-private 
+private
 
 def all_rows_the_same
-  
-  return (@grid.uniq.count == 1) && (@grid[0].max == @grid[0].min) 
+
+  return (@grid.uniq.count == 1) && (@grid[0].max == @grid[0].min)
 end
 
 def traverse_paths(y, x, path= {path: [], cost: 0})
@@ -56,18 +56,18 @@ def traverse_paths(y, x, path= {path: [], cost: 0})
 	path[:path] << y
 	if (x == (@grid[0].count - 1 ))
 		@path_list << path
-		return 
+		return
     end
-    
+
    calc_moves(y).each do |move|
    	unless invalid_move(path[:cost], move, x + 1)
-     traverse_paths(move, x + 1, Marshal.load(Marshal.dump(path))) 
+     traverse_paths(move, x + 1, Marshal.load(Marshal.dump(path)))
     else
     	@path_list << path
     	return
     end
- 
-   end 
+
+   end
 end
 
 def manual_build_path
@@ -85,7 +85,7 @@ end
 def calc_moves(y)
    [[y, :up], [y, :down]].map{|m| move(m[0], m[1])} + [y]
 end
- 
+
 def invalid_move(cost, y, x)
 	#path[:path] << next_move
     #ext_move_path = path
@@ -100,7 +100,7 @@ end
 
 
 def move(y, dir=:up)
-  new_y =  dir == :up ? y - 1 : y + 1 
+  new_y =  dir == :up ? y - 1 : y + 1
   new_y = @grid.count - 1 if new_y < 0 #move to bottom row if out of bounds
   new_y = 0 if new_y > @grid.count - 1 #move to top if out of bounds
   new_y
