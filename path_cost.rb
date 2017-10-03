@@ -18,18 +18,16 @@ class PathCost
       traverse_paths(i, 0)
      end
     else
-
-    	@path_list << manual_build_path
+      @path_list << manual_build_path
     end
      set_min_cost_path
   end
-
+  
   def to_s
   	#puts @path_list.inspect
   	"%s\n%s\n%s" % [complete?, min_cost, output_path]
   end
-
-
+  
   def min_cost
   	@min_cost_path[:cost]
   end
@@ -39,25 +37,22 @@ class PathCost
   end
 
   def complete?
-
     @min_cost_path[:path].count == @grid[0].count ? 'Yes' : 'No'
   end
 
   private
 
   def all_rows_the_same
-
     return (@grid.uniq.count == 1) && (@grid[0].max == @grid[0].min)
   end
 
   def traverse_paths(y, x, path= {path: [], cost: 0})
-
-  	path[:cost] += @grid[y][x]
+    path[:cost] += @grid[y][x]
   	path[:path] << y
   	if (x == (@grid[0].count - 1 ))
   		@path_list << path
   		return
-      end
+    end
 
      calc_moves(y).each do |move|
      	unless invalid_move(path[:cost], move, x + 1)
@@ -66,7 +61,6 @@ class PathCost
       	@path_list << path
       	return
       end
-
      end
   end
 
@@ -103,9 +97,9 @@ class PathCost
     new_y = 0 if new_y > @grid.count - 1 #move to top if out of bounds
     new_y
   end
+  
   def set_min_cost_path
-
-     sorted_paths = @path_list.sort{|a,b| a[:cost] <=> b[:cost] }
+    sorted_paths = @path_list.sort{|a,b| a[:cost] <=> b[:cost] }
      #get furthest path for incompletes
      @min_cost_path = sorted_paths.max_by{|a| a[:path].length }
   end
