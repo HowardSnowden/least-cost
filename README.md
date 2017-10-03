@@ -1,6 +1,6 @@
 #### Run tests
 `bundle install`
-`rspec` 
+-`rspec` 
 
 #### Run Program
 `ruby main.rb  [your_input file]`
