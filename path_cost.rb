@@ -1,6 +1,8 @@
+
 class PathCost
 
 COST_LIMIT = 50
+attr_accessor :grid
 def initialize(lines)
 	@grid = lines.map do |line|
 		line.split(' ').map(&:to_i)
@@ -10,13 +12,17 @@ def initialize(lines)
 end 
 
 def exec
-   (@grid.count - 1).times do |i|
+  #large grids with all 0s will take a long time to complete...
+  unless all_rows_the_same
+  	(@grid.count - 1).times do |i|
     traverse_paths(i, 0)
    end
+  else
+
+  	@path_list << manual_build_path
+  end
    set_min_cost_path
 end
-
-
 
 def to_s 
 	#puts @path_list.inspect
@@ -24,51 +30,74 @@ def to_s
 end
 
 
+def min_cost
+	@min_cost_path[:cost]
+end
+
+def output_path
+  @min_cost_path[:path].map{|m| m + 1}.join(' ')
+end
+
+def complete? 
+  
+  @min_cost_path[:path].count == @grid[0].count ? 'Yes' : 'No'
+end
 
 private 
 
-def traverse_paths(y, x, path = [])
-	path << y
+def all_rows_the_same
+  
+  return (@grid.uniq.count == 1) && (@grid[0].max == @grid[0].min) 
+end
+
+def traverse_paths(y, x, path= {path: [], cost: 0})
+
+	path[:cost] += @grid[y][x]
+	path[:path] << y
 	if (x == (@grid[0].count - 1 ))
 		@path_list << path
 		return 
     end
     
    calc_moves(y).each do |move|
-   	unless invalid_move(path.dup, move)
-     traverse_paths(move, x + 1, path.dup) 
+   	unless invalid_move(path[:cost], move, x + 1)
+     traverse_paths(move, x + 1, Marshal.load(Marshal.dump(path))) 
     else
     	@path_list << path
     	return
     end
  
    end 
- 
-   
+end
+
+def manual_build_path
+	path = {cost: 0, path: [] }
+  	i = 0
+  	while (i <= @grid[0].length - 1)
+  		break if (path[:cost] + @grid[0][i]) > COST_LIMIT
+  		path[:cost] += @grid[0][i]
+  		path[:path] << 0
+   		i += 1
+  	end
+  	path
 end
 
 def calc_moves(y)
    [[y, :up], [y, :down]].map{|m| move(m[0], m[1])} + [y]
 end
  
-def invalid_move(path, next_move)
-	next_move_path = path << next_move
-	total_cost_over?(next_move_path)
+def invalid_move(cost, y, x)
+	#path[:path] << next_move
+    #ext_move_path = path
+    cost = cost + @grid[y][x]
+	total_cost_over?(cost)
 end
 
-def total_cost_over?(path)
-	
-	
-	path_cost(path) >= COST_LIMIT
+def total_cost_over?(cost)
+	cost >= COST_LIMIT
 end
 
-def path_cost(path)
-    cost = 0
-	path.each_with_index do |y, x|
-	  cost += @grid[y][x] || 0
-	end	
-	cost
-end
+
 
 def move(y, dir=:up)
   new_y =  dir == :up ? y - 1 : y + 1 
@@ -78,24 +107,12 @@ def move(y, dir=:up)
 end
 
 
-def min_cost
-	path_cost(@min_cost_path)
-end
-
-def output_path
-  @min_cost_path.map{|m| m + 1}.join(' ')
-end
-
-def complete? 
-  @min_cost_path.count == @grid[0].count ? 'Yes' : 'No'
-end
 
 def set_min_cost_path
 
-   sorted_paths = @path_list.sort{|a,b| path_cost(a) <=> path_cost(b) }
+   sorted_paths = @path_list.sort{|a,b| a[:cost] <=> b[:cost] }
    #get furthest path for incompletes
-   @min_cost_path = sorted_paths.max_by(&:length)
+   @min_cost_path = sorted_paths.max_by{|a| a[:path].length }
 end
-
 
 end
