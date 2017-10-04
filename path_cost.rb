@@ -43,7 +43,7 @@ class PathCost
   private
 
   def all_rows_the_same
-    return (@grid.uniq.count == 1) && (@grid[0].max == @grid[0].min)
+    return (@grid.uniq.count == 1) #&& (@grid[0].max == @grid[0].min)
   end
 
   def traverse_paths(y, x, path= {path: [], cost: 0})
@@ -99,9 +99,10 @@ class PathCost
   end
   
   def set_min_cost_path
-    sorted_paths = @path_list.sort{|a,b| a[:cost] <=> b[:cost] }
-     #get furthest path for incompletes
-     @min_cost_path = sorted_paths.max_by{|a| a[:path].length }
+    #@path_list.sort!{|a,b| a[:cost] <=> b[:cost] } #.sort{|a, b| a[:path].length <=>  b[:path].length 
+    best_length = @path_list.max_by{|a| a[:path].length}[:path].length
+    @min_cost_path = @path_list.select{|v| v[:path].length == best_length}.min_by{|a| a[:cost]}
+
   end
 
 end
